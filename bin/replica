@@ -1,0 +1,151 @@
+#!/usr/bin/env node
+
+var util = require("util")
+  , readline = require("readline")
+  , interface = readline.createInterface(process.stdin, process.stdout)
+  , cli = require("cli")
+  , spawn = require("child_process").spawn
+  , http = require("http")
+  , httpStatic = require('node-static')
+  , staticServer = new httpStatic.Server('')
+  , URL = require('url')
+  , server
+  , io = require("socket.io");
+
+
+cli.parse({
+  debug:  ['d', 'print Socket.IO log to STDOUT', 'boolean', false],
+  port:  ['p', 'Listen on this port', 'number', 7009],
+  browser:  ['b', 'Open Replica page with specified browser command', 'string', null]
+});
+
+cli.main(main);
+
+
+function main(args, options) {
+  var socket = initSocket(options.port, options.debug);
+  initPrompt(options);
+  initListeners(socket);
+
+  if ( options.browser ) {
+    spawn(options.browser, ["http://127.0.0.1:" + options.port + "/"]);
+  }
+}
+
+function initSocket(port, debug) {
+  var socket;
+  server = http.createServer(function (req, res) {
+    var url = URL.parse(req.url),
+        path = url.pathname;
+
+    if ( path === "/" ) {
+      serveRoot(req, res);
+    }
+    else {
+      serveStatic(req, res, path);
+    }
+
+  });
+
+  server.listen(port);
+
+  if ( debug ) {
+    socket = io.listen(server, { origins: "*.*" } );
+  }
+  else {
+    // override log function to suppress Socket.IO's log
+    socket = io.listen(server, { log: function() {} } );
+  }
+  return socket;
+}
+
+function serveRoot(req, res) {
+  res.writeHead(200, { "Content-Type": "text/html" } );
+  res.end(heredoc(function() { /*
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Replica</title>
+  <script src="/socket.io/socket.io.js" type="text/javascript"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
+  <script src="/public/js/replica.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="/public/style/main.css" />
+  <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css' />
+  <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css' />
+</head>
+<body>
+  <h1><a>Replica >> </a></h1>
+  <p>
+    This is Replica page. <br/>
+    JavaScript code you typed <br/>
+    will be executed on this browser window. <br/>
+    <br/>
+    Blue "Replica" on top of this page <br/>
+    is a link for bookmarklet of Replica. <br/>
+    It makes any page Replica-connected. <br/>
+    ( You can execute JS on any page from Replica ! )
+  </p>
+  <div id="command">Broadcast JS command : <br/>
+    <input type="text" size="50" />
+    <input type="submit" value="fire" />
+  </div>
+  <div id="history">
+    Command history (click to repeat) : 
+    <ul>
+    </ul>
+  </div>
+</body>
+</html>
+  */ }));
+}
+
+function serveStatic(req, res, path) {
+  staticServer.serve(req, res);
+}
+
+function initPrompt(options) {
+  console.log("Replica server is running on http://127.0.0.1:" + options.port + "/");
+  interface.output.write(heredoc(function() { /*
+
+This is Replica console.
+You can type JavaScript code from this REPL
+and it will be executed in connected browsers.
+
+
+  */ }));
+
+  interface.setPrompt("Replica >> ");
+  interface.prompt();
+}
+
+function initListeners(socket) {
+  var clients = [];
+
+  socket.on("connection", function(client) {
+    clients.push(client);
+
+    client.on("message", function(data) {
+      socket.broadcast(data);
+    });
+  });
+
+
+  interface.addListener("line", function(cmd) {
+    clients.forEach(function(client) {
+      client.send(cmd);
+    });
+    interface.prompt();
+  });
+
+  interface.addListener("close", function(cmd) {
+    interface.input.destroy();
+    interface.output.destroy();
+    server.close();
+  });
+
+}
+
+function heredoc(f) {
+  return f.toString().split("\n").slice(1, -1).join("\n");
+}

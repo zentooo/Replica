@@ -1,0 +1,18 @@
+{
+  "name": "Replica",
+  "description": "REPL which throws JavaScript code to browsers",
+  "version": "0.1.0",
+  "author": "zentooo<ankerasoy@gmail.com>",
+  "repository": {
+      "type": "git",
+      "url": "http://github.com/zentooo/Replica.git"
+  },
+  "keywords": ["repl", "debug"],
+  "dependencies": {
+    "cli": ">= 0.2.8",
+    "node-static": ">= 0.5.3",
+    "socket.io": ">= 0.6.16"
+  },
+  "bin": "./bin/replica",
+  "engines": { "node": ">= 0.3.0" }
+}

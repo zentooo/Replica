@@ -1,0 +1,91 @@
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6,
+pre, form, fieldset, input, p, blockquote, th, td {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 100%;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+address, caption, cite, code, dfn, em, strong, th, var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+table {
+  border-collapse: collapse;
+  font-weight: normal;
+}
+
+fieldset, img {
+  border: 0;
+}
+
+caption, th {
+  text-align: left;
+}
+
+q:before, q:after {
+  content: '';
+}
+
+
+
+body {
+  position: relative;
+  background-color: #111111;
+  color: white;
+  text-align: right;
+  font-family: "Ubuntu";
+}
+
+h1 a {
+  position: absolute;
+  top: 40px;
+  left: 50px;
+  font-size: 500%;
+  color: #0088cc;
+  text-decoration: none;
+  font-family: "Lato";
+}
+
+p {
+  position: absolute;
+  top: 180px;
+  left: 60px;
+  text-align: left;
+  width: 500px;
+}
+
+div#history {
+  position: absolute;
+  top: 70px;
+  left: 550px;
+  text-align: left;
+}
+
+div#history ul {
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+div#history li {
+  margin-bottom: 10px;
+}
+
+div#command {
+  position: absolute;
+  top: 380px;
+  left: 60px;
+  text-align: left;
+}
+
+div#footer {
+  position: absolute;
+  left: 540px;
+}
