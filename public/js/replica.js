@@ -40,8 +40,7 @@ jQuery(function() {
           var socket = new io.Socket("##host##", { port: "##port##" });
           socket.connect();
           socket.on("message", function(data) {
-            var result = eval(data);
-            socket.send(result);
+            eval(data);
           });
 
           head.removeChild(script);
