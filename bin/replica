@@ -34,6 +34,7 @@ function main(args, options) {
 
 function initSocket(port, debug) {
   var socket;
+
   server = http.createServer(function (req, res) {
     var url = URL.parse(req.url),
         path = url.pathname;
@@ -44,7 +45,6 @@ function initSocket(port, debug) {
     else {
       serveStatic(req, res, path, debug);
     }
-
   });
 
   server.listen(port);
@@ -56,6 +56,7 @@ function initSocket(port, debug) {
     // override log function to suppress Socket.IO's log
     socket = io.listen(server, { log: function() {} } );
   }
+
   return socket;
 }
 
@@ -138,7 +139,6 @@ function initListeners(socket) {
     });
   });
 
-
   interface.addListener("line", function(cmd) {
     clients.forEach(function(client) {
       client.send(cmd);
@@ -151,7 +151,6 @@ function initListeners(socket) {
     interface.output.destroy();
     server.close();
   });
-
 }
 
 function heredoc(f) {

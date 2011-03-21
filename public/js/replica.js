@@ -1,4 +1,4 @@
-jQuery(function() {
+jQuery(function($) {
 
   var socket = new io.Socket();
   socket.connect();
