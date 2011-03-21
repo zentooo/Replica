@@ -8,7 +8,9 @@ Install
 -------
 
 git clone git://github.com/zentooo/Replica.git
+
 cd Replica
+
 npm install .
 
 or
