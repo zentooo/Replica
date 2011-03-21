@@ -50,7 +50,7 @@ function initSocket(port, debug) {
   server.listen(port);
 
   if ( debug ) {
-    socket = io.listen(server, { origins: "*.*" } );
+    socket = io.listen(server);
   }
   else {
     // override log function to suppress Socket.IO's log
