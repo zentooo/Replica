@@ -26,5 +26,5 @@ Run **replica** command and open http://127.0.0.1:7009/ (defaullt) with your bro
 * **replica --help** ... show help
 * **replica -b {command}** ... open Replica page with specified browser command (for Linux, BSD)
 * **replica -o** ... open Replica page with open command (for Mac OS X)
-* **replica -p {port}** ... run Replica server on specified port
+* **replica -p {port}** ... run Replica server with specified port number
 * **replica -d** ... show debug messages on STDOUT
