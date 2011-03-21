@@ -12,7 +12,6 @@ var util = require("util")
   , server
   , io = require("socket.io");
 
-
 cli.parse({
   debug:  ['d', 'print Socket.IO log to STDOUT', 'boolean', false],
   port:  ['p', 'Listen on this port', 'number', 7009],
@@ -74,8 +73,10 @@ function serveRoot(req, res) {
   <title>Replica</title>
   <script src="/socket.io/socket.io.js" type="text/javascript"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript"></script>
-  <script src="/public/js/replica.js" type="text/javascript"></script>
-  <link rel="stylesheet" href="/public/style/main.css" />
+  <!-- temporary <script src="/public/js/replica.js" type="text/javascript"></script> -->
+  <script src="http://github.com/zentooo/Replica/raw/master/public/js/replica.js" type="text/javascript"></script>
+  <!-- temporary <link rel="stylesheet" href="/public/style/main.css" /> -->
+  <link rel="stylesheet" href="http://github.com/zentooo/Replica/raw/master/public/style/main.css" />
   <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css' />
   <link href='http://fonts.googleapis.com/css?family=Ubuntu' rel='stylesheet' type='text/css' />
 </head>
@@ -111,7 +112,7 @@ function serveStatic(req, res, path, debug) {
       if ( debug ) {
         console.log("Error serving " + staticServer.root + path + " - " + err.message);
       }
-      res.writeHead(err.status, err.headers);
+      res.writeHead(err.status || 404, err.headers);
       res.end();
     }
   });
