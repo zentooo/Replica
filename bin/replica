@@ -1,25 +1,30 @@
 #!/usr/bin/env node
 
+var cwd = process.cwd();
 process.chdir(__dirname + "/../");
 
 var util = require("util")
-  , readline = require("readline")
-  , interface = readline.createInterface(process.stdin, process.stdout)
-  , cli = require("cli")
-  , path = require("path")
+  , fs = require("fs")
   , spawn = require("child_process").spawn
-  , http = require("http")
-  , httpStatic = require('node-static')
-  , staticServer = new httpStatic.Server('')
+  , readline = require("readline")
+  , path = require("path")
   , URL = require('url')
-  , server
-  , io = require("socket.io");
+  , http = require("http")
+
+  , cli = require("cli")
+  , io = require("socket.io")
+  , httpStatic = require('node-static')
+
+  , staticServer = new httpStatic.Server('')
+  , clients = []
+  , server;
+
 
 cli.parse({
   debug:  ['d', 'print Socket.IO log to STDOUT', 'boolean', false],
   port:  ['p', 'Listen on this port', 'number', 7009],
   browser:  ['b', 'Open Replica page with specified browser command', 'string', null],
-  open:  ['o', 'Open Replica page with open command', 'boolean', false],
+  open:  ['o', 'Open Replica page with open command', 'boolean', false]
 });
 
 cli.main(main);
@@ -27,9 +32,41 @@ cli.main(main);
 
 function main(args, options) {
   var socket = initSocket(options.port, options.debug);
-  initPrompt(options);
-  initListeners(socket);
 
+  if ( args.length > 0 ) {
+    runScripts(socket, args);
+  }
+  else {
+    runRepl(socket, options);
+  }
+
+  openBrowser(options);
+}
+
+function runRepl(socket, options) {
+  var interface = initPrompt(options);
+  initListeners(socket, interface);
+}
+
+function runScripts(socket, args) {
+  initListeners(socket, null, function() {
+    args.forEach(function(script) {
+      var path = (script.charAt(0) === '/') ? script : cwd + "/" + script;
+
+      fs.readFile(path, "utf8", function(err, data) {
+        clients.forEach(function(client) {
+          client.send(data);
+        });
+      });
+    });
+
+    setTimeout(function() {
+      process.exit();
+    }, 500);
+  });
+}
+
+function openBrowser(options) {
   if ( options.browser ) {
     spawn(options.browser, ["http://127.0.0.1:" + options.port + "/"]);
   }
@@ -120,6 +157,8 @@ function serveStatic(req, res, path, debug) {
 }
 
 function initPrompt(options) {
+  var interface = readline.createInterface(process.stdin, process.stdout);
+
   console.log("Replica server is running on http://127.0.0.1:" + options.port + "/");
   interface.output.write(heredoc(function() { /*
 
@@ -132,10 +171,11 @@ and it will be executed in connected browsers.
 
   interface.setPrompt("Replica >> ");
   interface.prompt();
+
+  return interface;
 }
 
-function initListeners(socket) {
-  var clients = [];
+function initListeners(socket, interface, callback) {
 
   socket.on("connection", function(client) {
     clients.push(client);
@@ -143,20 +183,26 @@ function initListeners(socket) {
     client.on("message", function(data) {
       socket.broadcast(data);
     });
+
+    if ( callback && typeof callback === "function" ) {
+      callback();
+    }
   });
 
-  interface.addListener("line", function(cmd) {
-    clients.forEach(function(client) {
-      client.send(cmd);
+  if ( interface ) {
+    interface.addListener("line", function(cmd) {
+      clients.forEach(function(client) {
+        client.send(cmd);
+      });
+      interface.prompt();
     });
-    interface.prompt();
-  });
 
-  interface.addListener("close", function(cmd) {
-    interface.input.destroy();
-    interface.output.destroy();
-    server.close();
-  });
+    interface.addListener("close", function(cmd) {
+      interface.input.destroy();
+      interface.output.destroy();
+      server.close();
+    });
+  }
 }
 
 function heredoc(f) {
