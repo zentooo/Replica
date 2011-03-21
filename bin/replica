@@ -7,7 +7,7 @@ var util = require("util")
   , spawn = require("child_process").spawn
   , http = require("http")
   , httpStatic = require('node-static')
-  , staticServer = new httpStatic.Server('')
+  , staticServer = new httpStatic.Server('..')
   , URL = require('url')
   , server
   , io = require("socket.io");
