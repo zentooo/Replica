@@ -16,7 +16,8 @@ var util = require("util")
 cli.parse({
   debug:  ['d', 'print Socket.IO log to STDOUT', 'boolean', false],
   port:  ['p', 'Listen on this port', 'number', 7009],
-  browser:  ['b', 'Open Replica page with specified browser command', 'string', null]
+  browser:  ['b', 'Open Replica page with specified browser command', 'string', null],
+  open:  ['o', 'Open Replica page with open command', 'boolean', false],
 });
 
 cli.main(main);
@@ -29,6 +30,9 @@ function main(args, options) {
 
   if ( options.browser ) {
     spawn(options.browser, ["http://127.0.0.1:" + options.port + "/"]);
+  }
+  else if ( options.open ) {
+    spawn("open", ["http://127.0.0.1:" + options.port + "/"]);
   }
 }
 
