@@ -44,8 +44,8 @@ function main(args, options) {
 }
 
 function runRepl(socket, options) {
-  var interface = initPrompt(options);
-  initListeners(socket, interface);
+  var repl = initPrompt(options);
+  initListeners(socket, repl);
 }
 
 function runScripts(socket, args) {
@@ -157,10 +157,10 @@ function serveStatic(req, res, path, debug) {
 }
 
 function initPrompt(options) {
-  var interface = readline.createInterface(process.stdin, process.stdout);
+  var repl = readline.createInterface(process.stdin, process.stdout);
 
   console.log("Replica server is running on http://127.0.0.1:" + options.port + "/");
-  interface.output.write(heredoc(function() { /*
+  repl.output.write(heredoc(function() { /*
 
 This is Replica console.
 You can type JavaScript code from this REPL
@@ -169,13 +169,13 @@ and it will be executed in connected browsers.
 
   */ }));
 
-  interface.setPrompt("Replica >> ");
-  interface.prompt();
+  repl.setPrompt("Replica >> ");
+  repl.prompt();
 
-  return interface;
+  return repl;
 }
 
-function initListeners(socket, interface, callback) {
+function initListeners(socket, repl, callback) {
 
   socket.on("connection", function(client) {
     clients.push(client);
@@ -189,17 +189,17 @@ function initListeners(socket, interface, callback) {
     }
   });
 
-  if ( interface ) {
-    interface.addListener("line", function(cmd) {
+  if ( repl ) {
+    repl.addListener("line", function(cmd) {
       clients.forEach(function(client) {
         client.send(cmd);
       });
-      interface.prompt();
+      repl.prompt();
     });
 
-    interface.addListener("close", function(cmd) {
-      interface.input.destroy();
-      interface.output.destroy();
+    repl.addListener("close", function(cmd) {
+      repl.input.destroy();
+      repl.output.destroy();
       server.close();
     });
   }
