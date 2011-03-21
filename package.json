@@ -1,5 +1,5 @@
 {
-  "name": "Replica",
+  "name": "replica",
   "description": "REPL which throws JavaScript code to browsers",
   "version": "0.1.0",
   "author": "zentooo<ankerasoy@gmail.com>",
