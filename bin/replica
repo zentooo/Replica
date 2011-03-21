@@ -42,7 +42,7 @@ function initSocket(port, debug) {
       serveRoot(req, res);
     }
     else {
-      serveStatic(req, res, path);
+      serveStatic(req, res, path, debug);
     }
 
   });
@@ -100,8 +100,16 @@ function serveRoot(req, res) {
   */ }));
 }
 
-function serveStatic(req, res, path) {
-  staticServer.serve(req, res);
+function serveStatic(req, res, path, debug) {
+  staticServer.serve(req, res, function(err, result) {
+    if ( err ) {
+      if ( debug ) {
+        console.log("Error serving " + staticServer.root + path + " - " + err.message);
+      }
+      res.writeHead(err.status, err.headers);
+      res.end();
+    }
+  });
 }
 
 function initPrompt(options) {
