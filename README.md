@@ -3,6 +3,7 @@ Replica
 
 Replica is REPL to evaluate JavaScript codes on browser context.
 
+![Replica](http://cdn-ak.f.st-hatena.com/images/fotolife/z/zentoo/20110321/20110321164658.png)
 
 Install
 -------
