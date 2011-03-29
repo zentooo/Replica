@@ -190,14 +190,14 @@ function initListeners(socket, repl, callback) {
   });
 
   if ( repl ) {
-    repl.addListener("line", function(cmd) {
+    repl.on("line", function(cmd) {
       clients.forEach(function(client) {
         client.send(cmd);
       });
       repl.prompt();
     });
 
-    repl.addListener("close", function(cmd) {
+    repl.on("close", function(cmd) {
       repl.input.destroy();
       repl.output.destroy();
       server.close();
